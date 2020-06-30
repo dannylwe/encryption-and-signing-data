@@ -30,24 +30,29 @@ func encrypt(message string, key rsa.PublicKey) string {
 	random := rand.Reader
 	// if label is not needed, nil 
 	cipherText, err := rsa.EncryptOAEP(sha256.New(), random, &key, []byte(message), label)
-	if err != nil {
-		fmt.Println(err)
-	}
+	
+	checkError(err)
+	
 	return base64.StdEncoding.EncodeToString(cipherText)
 }
 
 func decrypt(cipherText string, privateKey rsa.PrivateKey) string {
 	cipher, err := base64.StdEncoding.DecodeString(cipherText)
-	if err != nil {
-		fmt.Println(err)
-	}
+	
+	checkError(err)
+
 	label := []byte("OAEP Encrypted")
 	rng := rand.Reader
 	plainText, err := rsa.DecryptOAEP(sha256.New(), rng, &privateKey, cipher, label)
 
+	checkError(err)
+
+	fmt.Println("Original string: ", string(plainText))
+	return string(plainText)
+}
+
+func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Original string: ", string(plainText))
-	return string(plainText)
 }
